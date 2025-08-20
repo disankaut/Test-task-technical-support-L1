@@ -1,0 +1,11 @@
+# 1. Запустить все сервисы в фоне
+docker compose up -d
+
+# 2. Проверить, что все контейнеры работают
+docker compose ps
+
+# 3. Посмотреть логи
+docker compose logs backend1
+
+# 4. Остановить сервисы
+docker compose down

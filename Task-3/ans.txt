@@ -1,0 +1,75 @@
+1) grep - входит в набор программ GNU и используется для поиска строк в файлах и файлов по их содержимому.
+Достоинства: повсеместно доступен, мощные регулярные выражения, гибкость.
+Недостатки: медленный на больших проектах, нет встроенной подсветки, не игнорирует .git по умолчанию.
+grep "error" *.log                                              # ищет "error" во всех .log-файлах текущего каталога (регистрозависимо)
+grep -i "error" *.log                                           # ищет "error", "Error", "ERROR" и т.п. (без учёта регистра)
+grep -w "error" *.log                                           # ищет только целое слово "error", не находит "error_log" или "enderror"
+grep -iw "error" *.log                                          # без учёта регистра + только целое слово
+grep -n "error" файл.log                                        # показывает номера строк, где найдено "error"
+grep -l "error" *.log                                           # показывает имена файлов, в которых есть "error" (без содержимого)
+grep -c "error" *.log                                           # показывает количество вхождений "error" в каждом .log-файле
+grep -v "error" файл.log                                        # показывает все строки, КРОМЕ тех, что содержат "error"
+grep -r "error" /var/log/                                       # рекурсивно ищет "error" во всех файлах в /var/log/ и подкаталогах
+grep -r --include="*.log" "error" /var/log/                     # ищет "error" только в .log-файлах внутри /var/log/
+grep -r --exclude="*.gz" "error" .                              # ищет "error" во всех файлах, кроме .gz
+grep -r --exclude-dir={.git,node_modules} "error" .             # исключает поиск в .git и node_modules
+grep -A 2 -B 3 "error" файл.log                                 # показывает 3 строки до и 2 после каждого совпадения
+grep -C 3 "error" файл.log                                      # показывает по 3 строки до и после совпадения
+grep -rwl "error" .                                             # рекурсивно, только имена файлов, целое слово, без учёта регистра
+grep -a "error" бинарный_файл                                   # ищет "error" в бинарном файле, как если бы он был текстовым
+find . -name "*.log" -exec grep -l "error" {} \;                # находит .log-файлы и проверяет, есть ли в них "error"
+grep -E "error|fail|warning" *.log                              # ищет "error", "fail" или "warning" (регулярные выражения)
+grep -r "error" . 2>/dev/null                                   # рекурсивный поиск, скрывая ошибки доступа (например, Permission denied)
+grep "^error" файл.log                                          # ищет строки, начинающиеся с "error"
+grep "error$" файл.log                                          # ищет строки, заканчивающиеся на "error"
+grep -x "error" файл.txt                                        # ищет строки, СОВПАДАЮЩИЕ целиком с "error"
+
+
+2) rg — ripgrep (быстрый, современный grep)
+Достоинства: очень высокая скорость (на C++), автоматически рекурсивен, игнорирует .git, node_modules, бинарные файлы, есть цветная подсветка совпадений
+sudo apt install ripgrep
+rg "error" *.log                         # ищет "error" во всех .log-файлах
+rg -i "error" *.log                      # без учёта регистра
+rg -w "error" *.log                      # только целое слово
+rg -l "error" /var/log/                  # имена файлов с "error"
+rg -n "error" файл.log                   # с номерами строк
+rg -g "*.log" "error" .                  # ищет "error" только в .log-файлах
+rg -g "!*.gz" "error" .                  # исключает .gz-файлы
+rg -g "!*.min.js" "error" .              # исключает минифицированные JS
+rg --type-list                           # показывает все типы файлов (js, py, log и т.д.)
+rg -t log "error" .                      # ищет "error" только в log-файлах
+rg -tcpp "error" .                       # только в C++ файлах
+rg --stats "error" .                     # показывает статистику (файлы просканированы, найдено)
+rg --colors 'match:fg:green' "error" .   # меняет цвет совпадений на зелёный
+rg --json "error" .                      # JSON-вывод (для скриптов)
+rg -S "error" .                          # умный поиск: учитывает регистр только если есть заглавные
+
+
+3) ack — поисковик для разработчиков, утилита, ориентированная на поиск в коде
+Достоинства: понимает типы файлов: --python, --js, --html, игнорирует VCS-папки (.git, .svn)
+sudo apt install ack
+ack "error" *.log            # ищет "error" во всех .log-файлах
+ack -i "error" *.log         # без учёта регистра
+ack -w "error" .             # только целое слово
+ack -l "error" .             # имена файлов с "error"
+ack -n "error" файл.log      # с номерами строк
+ack --type=py "error" .      # только в Python-файлах
+ack --type=js "error" .      # только в JavaScript
+ack --type=log "error" .     # только в log-файлах (если тип определён)
+ack --print0 "error" .       # вывод с null-разделителем (для xargs)
+ack --csv "error" .          # вывод в CSV-формате
+
+
+4) ag — the_silver_searcher - быстрый поисковик, созданный как альтернатива ack
+Достоинства: быстрее grep, игнорирует .git, node_modules, .svn, подсветка совпадений
+ag "error" *.log             # ищет "error" во всех .log-файлах
+ag -i "error" *.log          # без учёта регистра
+ag -w "error" .              # только целое слово, рекурсивно
+ag -l "error" .              # имена файлов с "error"
+ag -n "error" файл.log       # с номерами строк
+ag --log "error" .           # ищет только в log-файлах
+ag --python "error" .        # только в Python-файлах
+ag --stats "error" .         # статистика поиска
+ag -C 3 "error" файл.log     # по 3 строки до и после
+ag -G '\.log$' "error" .     # только файлы, подходящие под регулярку (заканчиваются на .log)
+
